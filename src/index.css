@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Noto+Sans+Arabic:wght@400;600;800&family=JetBrains+Mono&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #a855f7;
+  --color-brand-blue: #3b82f6;
+  --color-bg-dark: #020617;
+  --color-surface-dark: #0f172a;
+  
+  --font-sans: "Inter", "Noto Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer base {
+  body {
+    @apply bg-[#040712] text-slate-100 font-sans antialiased selection:bg-purple-500/30;
+  }
+}
+
+.glass-panel {
+  @apply bg-white/5 backdrop-blur-xl border border-white/10;
+}
+
+.chat-bubble-user {
+  @apply bg-purple-600 text-white rounded-2xl rounded-tr-none px-4 py-3 max-w-[85%] ml-auto shadow-lg shadow-purple-500/10;
+}
+
+.chat-bubble-ai {
+  @apply bg-slate-900/80 text-slate-100 rounded-2xl rounded-tl-none px-4 py-3 max-w-[85%] mr-auto border border-white/5 shadow-xl;
+}
+
+.action-chip {
+  @apply w-full bg-slate-900/50 hover:bg-slate-800/80 border border-white/5 text-slate-300 py-3.5 px-6 rounded-2xl text-right text-sm transition-all active:scale-[0.98] border-b-2 border-b-white/10;
+}
+
+.markdown-body {
+  @apply text-[15px] leading-relaxed;
+}
+
+.markdown-body p {
+  @apply mb-3 last:mb-0;
+}
+
+.input-glow:focus-within {
+  @apply ring-2 ring-purple-500/50 border-purple-500/50;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-800 rounded-full hover:bg-slate-700;
+}

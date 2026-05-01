@@ -1,0 +1,68 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // User Profiles
+    match /users/{userId} {
+      function isValidUser(data) {
+        return data.uid == userId && 
+               data.memory is string && data.memory.size() <= 10000;
+      }
+
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data);
+    }
+
+    // Chats
+    match /chats/{chatId} {
+      function isValidChat(data) {
+        return data.userId == request.auth.uid && 
+               data.title is string && data.title.size() <= 200;
+      }
+
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidChat(request.resource.data);
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid && isValidChat(request.resource.data);
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+
+      // Messages subcollection
+      match /messages/{messageId} {
+        function getChat() {
+          return get(/databases/$(database)/documents/chats/$(chatId)).data;
+        }
+        
+        function canAccessChat() {
+          return isSignedIn() && getChat().userId == request.auth.uid;
+        }
+
+        function isValidMessage(data) {
+          return data.role in ['user', 'model'] && 
+                 data.content is string && data.content.size() <= 5000;
+        }
+
+        allow list: if canAccessChat();
+        allow create: if canAccessChat() && isValidMessage(request.resource.data);
+      }
+    }
+  }
+}
